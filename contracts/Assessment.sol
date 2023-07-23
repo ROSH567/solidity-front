@@ -57,4 +57,22 @@ contract Assessment {
         // emit the event
         emit Withdraw(_withdrawAmount);
     }
+    function withdrawall()public{
+
+
+        balance=0;
+    }
+    function withdraw_custom(uint a) public {
+
+        assert(balance>a);
+        balance-=a; 
+        
+    }
+    
+    function deposit_custom(uint a) public {
+
+        balance+=a; 
+        
+    }
+
 }
