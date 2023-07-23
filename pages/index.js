@@ -8,17 +8,22 @@ export default function HomePage() {
   const [atm, setATM] = useState(undefined);
   const [balance, setBalance] = useState(undefined);
 
+  
   const contractAddress = "0x5FbDB2315678afecb367f032d93F642f64180aa3";
+
   const atmABI = atm_abi.abi;
 
   const getWallet = async() => {
     if (window.ethereum) {
       setEthWallet(window.ethereum);
+      window.ethereum.on("accountsChanged", (accounts) => {
+        handleAccount(accounts);
+      });
     }
 
     if (ethWallet) {
-      const account = await ethWallet.request({method: "eth_accounts"});
-      handleAccount(account);
+      const accounts = await ethWallet.request({method: "eth_accounts"});
+      handleAccount(accounts);
     }
   }
 
@@ -49,7 +54,7 @@ export default function HomePage() {
     const provider = new ethers.providers.Web3Provider(ethWallet);
     const signer = provider.getSigner();
     const atmContract = new ethers.Contract(contractAddress, atmABI, signer);
- 
+
     setATM(atmContract);
   }
 
@@ -74,7 +79,36 @@ export default function HomePage() {
       getBalance();
     }
   }
+  
+  const getall = async () => {
+      if (atm) {
+        let tx=await atm.withdrawall();
+        await tx.wait();
+        getBalance();
 
+      }
+  }  
+  const custom_withdraw = async () => {
+    if (atm) {
+      const a = prompt("Enter value ", 0);
+      let tx=await atm.withdraw_custom(a);
+      await tx.wait();
+      getBalance();
+
+    }
+  }
+  const custom_deposit = async () => {
+    if (atm) {
+      const a = prompt("Enter value ", 0);
+      let tx=await atm.deposit_custom(a);
+      await tx.wait();
+      getBalance();
+
+    }
+  }
+  
+
+  
   const initUser = () => {
     // Check to see if user has Metamask
     if (!ethWallet) {
@@ -83,33 +117,112 @@ export default function HomePage() {
 
     // Check to see if user is connected. If not, connect to their account
     if (!account) {
-      return <button onClick={connectAccount}>Please connect your Metamask wallet</button>
-    }
+      return (
+      
+      <>
+      <button onClick={connectAccount} style={{position:"relative",marginTop:"75px",width:"137px", border:"10px solid black",borderRadius:"17px",zIndex:"2"}}>click to connect your Metamask wallet</button>
+        <span style={{display:"block", width:"148px",height:"80px",position:"relative",marginLeft:"443px",marginTop:"-79px",border:"12px solid #1a081b",borderRadius:"18px",backgroundColor:"#1a081b",}}>   </span>
+        </>
+    
+      )}
 
     if (balance == undefined) {
       getBalance();
     }
+    
 
     return (
-      <div>
-        <p>Your Account: {account}</p>
-        <p>Your Balance: {balance}</p>
-        <button onClick={deposit}>Deposit 1 ETH</button>
-        <button onClick={withdraw}>Withdraw 1 ETH</button>
+      <div style={{ backgroundColor :"black",display:"inline-block", color:"white" ,padding:"9x", border:"2px solid white", borderRadius:"20px",fontSize:"20px",fontStyle:"bold"}}>
+       <div style={{ backgroundColor :"hsl(252deg 13% 46% / 40%)",display:"inline-block", color:"aliceblue" ,padding:"20px", border:"2px solid #f9f9f9", borderRadius:"20px",fontSize:"20px",fontStyle:"bold"}}>
+        <div >
+          <p > Account: {account}</p>
+          <p > Balance: {balance}</p>
+    
+          <button  onClick={deposit}>
+            Deposit 1 unit
+          </button>
+          <button onClick={withdraw}>
+            Withdraw 1 unit
+          </button>
+        </div>
+  
+        <div>
+          
+          
+  
+          <button  onClick={getall}>
+            withdraw all amount
+          </button>
+          <p>
+          
+          
+          </p>
+          <button style={{ width: "167px" }} onClick={custom_withdraw}>
+            Withdraw custom amount
+          </button> &nbsp;&nbsp;
+          <button style={{ width: "167px" }} onClick={custom_deposit}>
+            deposit custom amount
+          </button>
+          
+        </div>
+        </div>
       </div>
-    )
+    );
+    
   }
 
-  useEffect(() => {getWallet();}, []);
+  useEffect(() => {
+    getWallet();
+  }, []);
 
   return (
     <main className="container">
-      <header><h1>Welcome to the Metacrafters ATM!</h1></header>
+      <header><h1><br></br>Welcome My Friend!</h1></header>
       {initUser()}
       <style jsx>{`
         .container {
-          text-align: center
+          text-align: center;
+          background-color:black;
+          color:white;
+          height:712px;
+          width:1058px;
+          position:relative;
+          margin-bottom: 100px;
+          margin-top:152px;
+          border:2px solid black;
+          border-radius:20px;
+          margin-left:400px;
+          
+
         }
+
+        h1{
+          background-color:black;
+          margin-bottom: 200px;
+          border:5px solid white;
+          display:inline-block;
+          padding:5px;
+          padding-bottom:20px;
+          text-align:center;
+          border-radius:20px;
+          color:white;
+
+
+        }
+       
+        header {
+          background: #d6d6d6;
+          margin-bottom: -111px;
+          border: 2px solid black;
+          border-radius:20px;
+          height:500px;
+      }
+      body{
+
+
+        background-color:black;
+      }
+        
       `}
       </style>
     </main>
